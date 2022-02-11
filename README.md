@@ -14,7 +14,7 @@ More broadly, I prefer to use a functional programming style, and I strove to im
 - `Node.js` (backend JS runtime)
 - `Express.js` (HTTP routing)
 - `body-parser` (utility for parsing JSON body from HTTP requests)
-- `Sqlite` (simple SQL data store)
+- `sqlite3`/`sqlite` (simple SQL data store/support for `async`/`await` syntax)
 - `bcrypt` (for hashing passwords)
 - `jsonwebtoken` (for generating JWT objects)
 - `nodemon` (for supporting more ergomonic development/speed of iteration)
