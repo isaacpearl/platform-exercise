@@ -5,7 +5,7 @@
 ### Overview
 I implemented a JWT-based solution to this challenge. My approach in solving the problem was to use simple tooling in order to put my focus into expressive code and the approximation a production-level application, rather than getting bogged down in the details of using a more heavy-handed toolkit. To that end, I used SQLite as my database, and Node.js/Express.js to handle the serverside code. This solution is very easy to set up and run locally, and could be deployed to Heroku with almost no configuration outside of connecting the deployment pipeline to the GitHub repository.
 
-Each endpoint is handled in its own router module (contained in the `routes/` directory), with only a couple functions shared between modules. The `index.js` file handles the top-level routing and server/db initialization. 
+Each endpoint is handled in its own router module (contained in the `routes/` directory), with only a couple functions shared between modules. The `index.js` file handles the top-level routing and server/db initialization. User data is stored in a `users` table, and a JWT blacklist (used to implement user logout) is stored in a separate `blacklist` table. 
 
 More broadly, I prefer to use a functional programming style, and I strove to implement functions as "purely" as possible when practical. The database is stored as a file in the local directory, and it gets initialized by a short Node.js script when the server starts up.
 
