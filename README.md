@@ -13,6 +13,15 @@ More broadly, I prefer to use a functional programming style, and I strove to im
 ### API
 TODO: add API documentation here
 
+### Tools Used
+- `Node.js`
+- `Express.js`
+- `body-parser`
+- `Sqlite`
+- `jsonwebtoken`
+- `nodemon`
+- `Axios` (for testing)
+
 ### Database (SQLite) Tables 
 #### users
 Columns:
@@ -26,15 +35,6 @@ Columns:
 - `token` (primary key string)
 - `expiration_date` (integer, a unix timestamp with accuracy measured in seconds)
 - `user_id` (integer, foreign key into the `users` table)
-
-### Tools
-- `Node.js`
-- `Express.js`
-- `body-parser`
-- `Sqlite`
-- `jsonwebtoken`
-- `nodemon`
-- `Axios` (for testing)
 
 ## Setup / How to start
 1. `git clone git@github.com:isaacpearl/platform-exercise.git`
