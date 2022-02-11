@@ -31,7 +31,7 @@ More broadly, I prefer to use a functional programming style, and I strove to im
 - Success response
   - Code: `200 OK`
   - Content: 
-      ```
+```
 {
     "message": "success",
     "data": {
@@ -39,12 +39,12 @@ More broadly, I prefer to use a functional programming style, and I strove to im
         "email": "test@guitars.com"
     }
 }
-      ```
+```
 - Error responses
   - `409` (User already exists with this email address)
   - `400` (Bad request)
 - Sample call
-    ```
+```
 curl --location --request POST 'http://localhost:3000/api/v1/register' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -52,7 +52,7 @@ curl --location --request POST 'http://localhost:3000/api/v1/register' \
     "email": "isaac@pearl.com",
     "password": "abc123"
 }'
-    ```
+```
 
 #### Log in
 - URI: `/login/`
@@ -63,52 +63,52 @@ curl --location --request POST 'http://localhost:3000/api/v1/register' \
 - Success response
   - Code: `200 OK`
   - Content:
-      ```
+```
 {
     "success": true,
     "message": "Login successful!",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGd1aXRhcnMuY29tIiwiaWF0IjoxNjQ0NTYxNTgyLCJleHAiOjE2NDQ1NjE4ODJ9.ZEFAQ0wj8-8oAxbrHgEXKCvxJpgWVAObqMiTTsASwt8"
 }
-      ```
+```
 - Error response
   - `404` (User not found)
   - `400` (Bad request)
 - Sample call
-    ```
+```
 curl --location --request POST 'http://localhost:3000/api/v1/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "email": "isaac@pearl.com",
     "password": "abc123"
 }'
-    ```
+```
 
 #### Log out
 - URI: `/logout/`
 - Method: `POST`
 - Authentication headers:
-    ```
+```
     {
     'Authorization': `Bearer ${token}`,
     ...
     }
-    ```
+```
 - Success response
   - Code: `200 OK`
   - Content:
-      ```
+```
 {
     "message": "success",
     "data": {
         "message": "Successfully logged out."
     }
 }
-      ```
+ ```
 - Error response
   - `403` (User not logged in)
   - `400` (Bad request)
 - Sample call
-    ```
+```
 curl --location --request POST 'http://localhost:3000/api/v1/logout' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg1MTAsImV4cCI6MTY0NDU3MjExMH0.PdH3NX3g8diy3NnrnkwlH29Qc3PuWivyEGld91uzvL0' \
@@ -116,7 +116,7 @@ curl --location --request POST 'http://localhost:3000/api/v1/logout' \
     "email": "fender@guitars.com",
     "password": "def456"
 }'
-    ```
+```
 
 #### Retrieve a user's data
 - URI: `/users/:id`
@@ -126,7 +126,7 @@ curl --location --request POST 'http://localhost:3000/api/v1/logout' \
 - Success response
   - Code: `200 OK`
   - Content:
-      ```
+```
 {
     "message": "success",
     "data": {
@@ -135,16 +135,16 @@ curl --location --request POST 'http://localhost:3000/api/v1/logout' \
         "name": "Isaac Pearl"
     }
 }
-      ```
+```
 - Error response
   - `404` (User not found)
   - `403` (Request not authorized)
   - `400`(Bad request)
 - Sample call
-    ```
+```
 curl --location --request GET 'http://localhost:3000/api/v1/users/3' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
-    ```
+```
 
 #### Update a user's data
 - URI: `/users/:id`
@@ -158,24 +158,24 @@ curl --location --request GET 'http://localhost:3000/api/v1/users/3' \
 - Success response:
   - Code: `200 OK`
   - Content:
-      ```
+```
 {
     "message": "success",
 }
-      ```
+```
 - Error response:
   - `404` (User not found)
   - `403` (Request not authorized)
   - `400`(Bad request)
 - Sample call:
-    ```
+```
 curl --location --request PUT 'http://localhost:3000/api/v1/users/3' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "isaac p"
 }'
-    ```
+```
 
 #### Delete a user
 - URI: `/users/:id`
@@ -188,11 +188,11 @@ curl --location --request PUT 'http://localhost:3000/api/v1/users/3' \
   - `403` (Request not authorized)
   - `400`(Bad request)
 - Sample call:
-    ```
+```
 curl --location --request DELETE 'http://localhost:3000/api/v1/users/3' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
 --header 'Content-Type: application/json' \
-    ```
+```
 
 ### Database (SQLite) Tables 
 #### users
@@ -225,4 +225,3 @@ Columns:
 - Implement full input validation/type checking
 - Modularize DB operations such that swapping out SQLite for PostgreSQL is as low-touch as possible 
 - Build out unit testing with better organization/coverage, and/or use framework such as Jest to standardize
-- 
