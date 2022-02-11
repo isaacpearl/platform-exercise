@@ -1,4 +1,5 @@
 // Declare global constants
+const config = require('../config.js');
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -45,7 +46,12 @@ const login = async (req, res) => {
         const userRow = await getUserRow(user.email);
         const passwordIsCorrect = await bcrypt.compare(user.password, userRow.password);
         if (passwordIsCorrect) {
-            res.json({"status":"login success!"});
+            const token = await jwt.sign(userRow, config.APP_KEYS.SECRET);
+            res.json({
+                success: true,
+                message: "Login successful!",
+                token: token,
+            });
         } else {
             throw new Error("Incorrect password");
         }
