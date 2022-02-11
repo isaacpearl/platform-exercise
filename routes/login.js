@@ -6,13 +6,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
-let db;
-(async () => {
-    db = await open({
-        filename: './fender_platform_exercise_data.db',
-        driver: sqlite3.Database
-    })
-})();
 
 /**
  * Gets a user's row in the user table via primary key of email
@@ -21,7 +14,7 @@ let db;
  *
  * @returns {Object} The user's data
  */
-const getUserRow = async (email) => {
+const getUserRow = async (db, email) => {
     const queryParams = [email];
     const getUserSql = "SELECT * FROM users where email = ?";
     const userRow = await db.get(getUserSql, queryParams);
@@ -41,12 +34,18 @@ const getUserRow = async (email) => {
  */
 const login = async (req, res) => {
     console.log(`login()`);
-    const user = req.body;
+    let db;
     try {
-        const userRow = await getUserRow(user.email);
+        db = await open({
+            filename: './fender_platform_exercise_data.db',
+            driver: sqlite3.Database
+        })
+        const user = req.body;
+        const userRow = await getUserRow(db, user.email);
         const passwordIsCorrect = await bcrypt.compare(user.password, userRow.password);
         if (passwordIsCorrect) {
-            const token = await jwt.sign({email: user.email, name: user.name}, config.APP_KEYS.SECRET);
+            console.log(userRow)
+            const token = await jwt.sign({id: userRow.id, email: user.email, name: user.name}, config.APP_KEYS.SECRET);
             res.json({
                 success: true,
                 message: "Login successful!",
@@ -55,11 +54,15 @@ const login = async (req, res) => {
         } else {
             throw new Error("Incorrect password");
         }
+        await db.close();
     } catch (err) {
         if (err.message.includes('not found')) {
             res.status(404).json({error: err.message});
         } else {
             res.status(400).json({error: err.message});
+        }
+        if (db) {
+            await db.close();
         }
     }
     return;

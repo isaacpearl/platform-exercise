@@ -8,10 +8,10 @@ let db;
     });
 
     // Create users table 
-    // TODO: what other fields do we need?
     const createUsersTableSql = `
         CREATE TABLE IF NOT EXISTS users ( 
-          email TEXT PRIMARY KEY,
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL UNIQUE,
           name TEXT NOT NULL,
           password TEXT NOT NULL
         )`;

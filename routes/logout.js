@@ -3,13 +3,6 @@ const express = require('express');
 const router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
-let db;
-(async () => {
-    db = await open({
-        filename: './fender_platform_exercise_data.db',
-        driver: sqlite3.Database
-    })
-})();
 
 /**
  * Attempt to log user out
@@ -19,6 +12,11 @@ let db;
  */
 const logout = async (req, res) => {
     console.log(`logout()`);
+    const db = await open({
+        filename: './fender_platform_exercise_data.db',
+        driver: sqlite3.Database
+    })
+    await db.close();
     return;
 };
 

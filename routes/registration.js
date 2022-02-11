@@ -5,14 +5,6 @@ const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10;
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
-let db;
-(async () => {
-    db = await open({
-        filename: './fender_platform_exercise_data.db',
-        driver: sqlite3.Database
-    })
-})();
-
 
 /**
  * Validates new user POST request input
@@ -46,13 +38,14 @@ const validateInput = (body) => {
 /**
  * Add new row to users table
  *
+ * @param   {Object} db The SQLite instance
  * @param   {String} email The user's email address
  * @param   {String} password The user's (hashed) password
  * @param   {String} name The user's name
  *
  * @returns {Object} The data written to the users table
  */
-const writeNewUser = async (email, password, name) => {
+const writeNewUser = async (db, email, password, name) => {
     const createUserSql = 'INSERT INTO users (email, password, name) VALUES (?,?,?)';
     const createUserQueryParams = [email, password, name];
     const insertResult = await db.run(createUserSql, createUserQueryParams);
@@ -70,25 +63,34 @@ const writeNewUser = async (email, password, name) => {
  */
 const registerUser = async (req, res) => {
     console.log(`registerUser()`);
-    const inputErrors = validateInput(req.body); 
-    if (inputErrors.length > 0) {
-        res.status(400).json({"error": inputErrors.join(", ")});
-        return;
-    }
-    const { name, email, password } = req.body;
+    let db;
     try {
+        db = await open({
+            filename: './fender_platform_exercise_data.db',
+            driver: sqlite3.Database,
+        })
+        const inputErrors = validateInput(req.body);
+        if (inputErrors.length > 0) {
+            res.status(400).json({"error": inputErrors.join(", ")});
+            return;
+        }
+        const { name, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-        const newUser = await writeNewUser(email, hashedPassword, name);
+        const newUser = await writeNewUser(db, email, hashedPassword, name);
         res.json({
             "message": "success",
             "data": newUser,
         });
+        await db.close();
     } catch (err) {
         if (err.message.includes('UNIQUE constraint failed: users.email')) {
             // Return 409 Conflict error, but we could use 204 or 202 with generic "wait for confirmation" message instead for security purposes
             res.status(409).json({error: `User already exists with email ${email}`});
         } else {
             res.status(400).json({error: err.message});
+        }
+        if (db) {
+            await db.close();
         }
     }
     return;
