@@ -10,17 +10,189 @@ Each endpoint is handled in its own router module (contained in the `routes/` di
 More broadly, I prefer to use a functional programming style, and I strove to implement functions as "purely" as possible when practical. The database is stored as a file in the local directory, and it gets initialized by a short Node.js script when the server starts up.
 
 
-### API
-TODO: add API documentation here
-
 ### Tools Used
-- `Node.js`
-- `Express.js`
-- `body-parser`
-- `Sqlite`
-- `jsonwebtoken`
-- `nodemon`
+- `Node.js` (backend JS runtime)
+- `Express.js` (HTTP routing)
+- `body-parser` (utility for parsing JSON body from HTTP requests)
+- `Sqlite` (simple SQL data store)
+- `bcrypt` (for hashing passwords)
+- `jsonwebtoken` (for generating JWT objects)
+- `nodemon` (for supporting more ergomonic development/speed of iteration)
 - `Axios` (for testing)
+
+### API
+#### Create a new user
+- URI: `/register/`
+- Method: `POST`
+- Data params:
+  - `email` (string, required)
+  - `password` (string, required, must contain at least one number and one letter)
+  - `name` (string, required)
+- Success response
+  - Code: `200 OK`
+  - Content: 
+      ```
+{
+    "message": "success",
+    "data": {
+        "name": "test Guitars",
+        "email": "test@guitars.com"
+    }
+}
+      ```
+- Error responses
+  - `409` (User already exists with this email address)
+  - `400` (Bad request)
+- Sample call
+    ```
+curl --location --request POST 'http://localhost:3000/api/v1/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Isaac Pearl",
+    "email": "isaac@pearl.com",
+    "password": "abc123"
+}'
+    ```
+
+#### Log in
+- URI: `/login/`
+- Method: `POST`
+- Data params:
+  - `email` (string, required)
+  - `password` (string, required)
+- Success response
+  - Code: `200 OK`
+  - Content:
+      ```
+{
+    "success": true,
+    "message": "Login successful!",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGd1aXRhcnMuY29tIiwiaWF0IjoxNjQ0NTYxNTgyLCJleHAiOjE2NDQ1NjE4ODJ9.ZEFAQ0wj8-8oAxbrHgEXKCvxJpgWVAObqMiTTsASwt8"
+}
+      ```
+- Error response
+  - `404` (User not found)
+  - `400` (Bad request)
+- Sample call
+    ```
+curl --location --request POST 'http://localhost:3000/api/v1/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "isaac@pearl.com",
+    "password": "abc123"
+}'
+    ```
+
+#### Log out
+- URI: `/logout/`
+- Method: `POST`
+- Authentication headers:
+    ```
+    {
+    'Authorization': `Bearer ${token}`,
+    ...
+    }
+    ```
+- Success response
+  - Code: `200 OK`
+  - Content:
+      ```
+{
+    "message": "success",
+    "data": {
+        "message": "Successfully logged out."
+    }
+}
+      ```
+- Error response
+  - `403` (User not logged in)
+  - `400` (Bad request)
+- Sample call
+    ```
+curl --location --request POST 'http://localhost:3000/api/v1/logout' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg1MTAsImV4cCI6MTY0NDU3MjExMH0.PdH3NX3g8diy3NnrnkwlH29Qc3PuWivyEGld91uzvL0' \
+--data-raw '{
+    "email": "fender@guitars.com",
+    "password": "def456"
+}'
+    ```
+
+#### Retrieve a user's data
+- URI: `/users/:id`
+- Method: `GET`
+- URL params
+  - `id` (required)
+- Success response
+  - Code: `200 OK`
+  - Content:
+      ```
+{
+    "message": "success",
+    "data": {
+        "id": 3,
+        "email": "isaac@pearl.com",
+        "name": "Isaac Pearl"
+    }
+}
+      ```
+- Error response
+  - `404` (User not found)
+  - `403` (Request not authorized)
+  - `400`(Bad request)
+- Sample call
+    ```
+curl --location --request GET 'http://localhost:3000/api/v1/users/3' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
+    ```
+
+#### Update a user's data
+- URI: `/users/:id`
+- Method: `PUT`
+- URL params:
+  - `id` (required)
+- Data params:
+  - `email` (string, optional)
+  - `name` (string, optional)
+  - TODO: `password` (string, optional)
+- Success response:
+  - Code: `200 OK`
+  - Content:
+      ```
+{
+    "message": "success",
+}
+      ```
+- Error response:
+  - `404` (User not found)
+  - `403` (Request not authorized)
+  - `400`(Bad request)
+- Sample call:
+    ```
+curl --location --request PUT 'http://localhost:3000/api/v1/users/3' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "isaac p"
+}'
+    ```
+
+#### Delete a user
+- URI: `/users/:id`
+- Method: `DELETE`
+- URL params:
+  - `id` (required)
+- Success response:
+- Error response:
+  - `404` (User not found)
+  - `403` (Request not authorized)
+  - `400`(Bad request)
+- Sample call:
+    ```
+curl --location --request DELETE 'http://localhost:3000/api/v1/users/3' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJpc2FhY0BwZWFybC5jb20iLCJpYXQiOjE2NDQ1Njg3MTcsImV4cCI6MTY0NDU3MjMxN30.rJ95sPSLloUeoM3NprG3r8gAxjyICIvqnsooQiBaKf8' \
+--header 'Content-Type: application/json' \
+    ```
 
 ### Database (SQLite) Tables 
 #### users
@@ -47,6 +219,7 @@ Columns:
 - Run `npm run tests`
 
 ## TODOs
+- Support changing password (w/ rehashing)
 - Switch out SQLite for PostgreSQL
 - Clean out blacklist table on time interval (checking for expired tokens and removing from the database)
 - Implement full input validation/type checking
