@@ -1,7 +1,9 @@
 // Declare global constants
+const config = require('../config.js');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const auth = require('../authenticate.js');
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
 let db;
@@ -42,9 +44,13 @@ const deleteUser = async (req, res) => {
  */
 const getUser = async (req, res) => {
     console.log(`getUser()`);
+    try {
+        const authStatus = await auth.authenticateRequest(req, config.APP_KEYS.SECRET);
+    } catch (err) {
+        console.log(err);
+    }
     return
 };
-
 // Add endpoints to router object
 router.get('/:id', getUser);
 router.put('/:id', updateUser);

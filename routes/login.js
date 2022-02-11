@@ -46,7 +46,7 @@ const login = async (req, res) => {
         const userRow = await getUserRow(user.email);
         const passwordIsCorrect = await bcrypt.compare(user.password, userRow.password);
         if (passwordIsCorrect) {
-            const token = await jwt.sign(userRow, config.APP_KEYS.SECRET);
+            const token = await jwt.sign({email: user.email, name: user.name}, config.APP_KEYS.SECRET);
             res.json({
                 success: true,
                 message: "Login successful!",
