@@ -4,6 +4,7 @@ const APP_KEYS = {
 
 const SETTINGS = {
     TOKEN_EXPIRATION: '1h',
+    PORT: 3000,
 };
 
 module.exports = {

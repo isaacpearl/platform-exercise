@@ -8,6 +8,7 @@ const registration = require('./routes/registration.js');
 const logout = require('./routes/logout.js');
 const users = require('./routes/users.js')
 const db = require('./initialize_db.js');
+const config = require('./config.js');
 
 // Set CORS permissively for development, TODO: lock down in production setting
 app.use(
@@ -29,6 +30,6 @@ app.use('/api/v1/logout', logout.router);
 app.use('/api/v1/users', users);
 
 // Confirm open port in console when server starts up
-app.listen(process.env.PORT || 3000, () => {
-    console.log(`server running on ${process.env.PORT || 3000}`);
+app.listen(process.env.PORT || config.SETTINGS.PORT, () => {
+    console.log(`server running on ${process.env.PORT || config.SETTINGS.PORT}`);
 });
