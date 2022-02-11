@@ -39,13 +39,20 @@ const login = async (req, res) => {
         db = await open({
             filename: './fender_platform_exercise_data.db',
             driver: sqlite3.Database
-        })
+        });
         const user = req.body;
         const userRow = await getUserRow(db, user.email);
         const passwordIsCorrect = await bcrypt.compare(user.password, userRow.password);
         if (passwordIsCorrect) {
             console.log(userRow)
-            const token = await jwt.sign({id: userRow.id, email: user.email, name: user.name}, config.APP_KEYS.SECRET);
+            const token = await jwt.sign({
+                id: userRow.id,
+                email: user.email,
+                name: user.name
+            }, config.APP_KEYS.SECRET,
+            {
+                expiresIn: config.SETTINGS.TOKEN_EXPIRATION,
+            });
             res.json({
                 success: true,
                 message: "Login successful!",

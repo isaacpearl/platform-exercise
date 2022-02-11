@@ -19,4 +19,19 @@ let db;
         .catch((err) => {
             console.log(err);
         });
+
+    // Create blacklist table
+    const createBlackListTableSql = `
+        CREATE TABLE IF NOT EXISTS blacklist ( 
+          token TEXT PRIMARY KEY,
+          expiration_date INTEGER NOT NULL,
+          user_id INTEGER NOT NULL,
+          FOREIGN KEY (user_id)
+               REFERENCES users (id) 
+        )`;
+    await db.run(createBlackListTableSql)
+        .catch((err) => {
+            console.log(err);
+        });
+    await db.close();
 })();

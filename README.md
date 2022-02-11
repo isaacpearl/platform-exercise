@@ -1,4 +1,4 @@
-# Fender Digital Platform Engineering Challenge
+# Isaac Pearl - Fender Digital Platform Engineering Challenge
 
 ## Description
 

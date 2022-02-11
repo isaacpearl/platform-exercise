@@ -68,7 +68,7 @@ const registerUser = async (req, res) => {
         db = await open({
             filename: './fender_platform_exercise_data.db',
             driver: sqlite3.Database,
-        })
+        });
         const inputErrors = validateInput(req.body);
         if (inputErrors.length > 0) {
             res.status(400).json({"error": inputErrors.join(", ")});
@@ -85,7 +85,7 @@ const registerUser = async (req, res) => {
     } catch (err) {
         if (err.message.includes('UNIQUE constraint failed: users.email')) {
             // Return 409 Conflict error, but we could use 204 or 202 with generic "wait for confirmation" message instead for security purposes
-            res.status(409).json({error: `User already exists with email ${email}`});
+            res.status(409).json({error: `User already exists with this email address`});
         } else {
             res.status(400).json({error: err.message});
         }

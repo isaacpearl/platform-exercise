@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const auth = require('../authenticate.js');
+const logout = require('./logout.js');
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
 
@@ -29,7 +30,6 @@ const updateUser = async (req, res) => {
         }
         const updateUserSql = `
             UPDATE users SET ${setString} WHERE id = ?`;
-        console.log(updateUserSql)
         const userRow = await db.run(updateUserSql, [params[0]]);
         console.log(userRow);
         if (!userRow) {
@@ -113,12 +113,13 @@ const getUser = async (req, res) => {
  * @returns {Object} Authentication details
  */
 const authenticatedUserRequest = async (req, res, operation, args) => {
+    let db;
     try {
-        const db = await open({
+        db = await open({
             filename: './fender_platform_exercise_data.db',
             driver: sqlite3.Database
         });
-        const authStatus = await auth.authenticateRequest(req, config.APP_KEYS.SECRET);
+        const authStatus = await auth.authenticateRequest(db, req, config.APP_KEYS.SECRET);
         if (authStatus.id !== parseInt(req.params.id)) {
             // TODO: add handling for admin users? e.g. ability to view/edit/remove other users' data
             throw new Error ('User not authorized');
@@ -134,8 +135,15 @@ const authenticatedUserRequest = async (req, res, operation, args) => {
             res.status(403).json({error: err.message});
         } else if (err.message.includes('not found')) {
             res.status(404).json({error: err.message});
+        } else if (err.message.includes('UNIQUE constraint failed: users.email')) {
+            res.status(409).json({error: `Email address is already taken`});
+        } else if (err.message.includes('jwt expired')) {
+            res.status(403).json({error: 'Token expired, please log in again'});
         } else {
             res.status(400).json({error: err.message});
+        }
+        if (db) {
+            await db.close();
         }
     }
     return;

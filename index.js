@@ -25,15 +25,10 @@ app.use(bodyParser.json());
 // Use imported route modules
 app.use('/api/v1/login', login);
 app.use('/api/v1/register', registration);
-app.use('/api/v1/logout', logout);
+app.use('/api/v1/logout', logout.router);
 app.use('/api/v1/users', users);
 
 // Confirm open port in console when server starts up
 app.listen(process.env.PORT || 3000, () => {
     console.log(`server running on ${process.env.PORT || 3000}`);
 });
-
-/*
-TODO:
-
-*/
