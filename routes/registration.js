@@ -1,6 +1,8 @@
 // Declare global constants
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+const SALT_ROUNDS = 10;
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
 let db;
@@ -11,6 +13,55 @@ let db;
     })
 })();
 
+
+/**
+ * Validates new user POST request input
+ *
+ * @param   {Object} body The new user registration request parameters
+ *
+ * @returns {String[]} All applicable error messages
+ */
+const validateInput = (body) => {
+    const inputErrors = [];
+    const containsLettersRegex = /.*[a-zA-Z].*/g;
+    const containsDigitsRegex = /\d/g;
+    if (!body.name){
+        inputErrors.push("No user name specified");
+    }
+    if (!body.email) {
+        inputErrors.push("No user email specified");
+    }
+    if (!body.password) {
+        inputErrors.push("No user password specified");
+    }
+    if (body.password && !(body.password.match(containsLettersRegex) && body.password.match(containsDigitsRegex))) {
+        inputErrors.push("Password must contain both numbers and letters");
+    }
+    if (body.email && !body.email.includes("@")) {
+        inputErrors.push("Email must contain an \'@\' symbol");
+    }
+    return inputErrors;
+}
+
+/**
+ * Add new row to users table
+ *
+ * @param   {String} email The user's email address
+ * @param   {String} password The user's (hashed) password
+ * @param   {String} name The user's name
+ *
+ * @returns {Object} The data written to the users table
+ */
+const writeNewUser = async (email, password, name) => {
+    const createUserSql = 'INSERT INTO users (email, password, name) VALUES (?,?,?)';
+    const createUserQueryParams = [email, password, name];
+    const insertResult = await db.run(createUserSql, createUserQueryParams);
+    return {
+        name: name,
+        email: email,
+    };
+};
+
 /**
  * Create new user 
  *
@@ -19,6 +70,27 @@ let db;
  */
 const registerUser = async (req, res) => {
     console.log(`registerUser()`);
+    const inputErrors = validateInput(req.body); 
+    if (inputErrors.length > 0) {
+        res.status(400).json({"error": inputErrors.join(", ")});
+        return;
+    }
+    const { name, email, password } = req.body;
+    try {
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const newUser = await writeNewUser(email, hashedPassword, name);
+        res.json({
+            "message": "success",
+            "data": newUser,
+        });
+    } catch (err) {
+        if (err.message.includes('UNIQUE constraint failed: users.email')) {
+            // Return 409 Conflict error, but we could use 204 or 202 with generic "wait for confirmation" message instead for security purposes
+            res.status(409).json({error: `User already exists with email ${email}`});
+        } else {
+            res.status(400).json({error: err.message});
+        }
+    }
     return;
 };
 

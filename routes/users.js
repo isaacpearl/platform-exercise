@@ -1,6 +1,7 @@
 // Declare global constants
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 const sqlite3 = require('sqlite3').verbose();
 const open = require('sqlite').open;
 let db;

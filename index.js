@@ -3,8 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const authentication = require('./routes/authentication.js');
+const login = require('./routes/login.js');
 const registration = require('./routes/registration.js');
 const logout = require('./routes/logout.js');
 const users = require('./routes/users.js')
@@ -24,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Use imported route modules
-app.use('/api/v1/auth', authentication);
+app.use('/api/v1/login', login);
 app.use('/api/v1/register', registration);
 app.use('/api/v1/logout', logout);
 app.use('/api/v1/users', users);
